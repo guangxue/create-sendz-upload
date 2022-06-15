@@ -3,12 +3,7 @@ import csv
 import pprint
 from datetime import datetime
 
-
 filename = sys.argv[1]
-
-print("filename: ", filename) #Column names for reading from csv file
-read_cols = ['Order Number', 'Paid On Date', 'Total Price', 'Quantity', 'Item Title', 'Sold For', 'Custom Label',
-    'Post To Name', 'Post To Address 1', 'Post To Address 2', 'Post To City', 'Post To Postal Code','Post To State', 'Post To Phone']
 
 # Column names for writing into csv file
 column_names=['Name', 'Email', 'Paid at', 'Total', 'Lineitem quantity', 'Lineitem name', 'Lineitem price','Lineitem sku',
@@ -18,10 +13,10 @@ column_names=['Name', 'Email', 'Paid at', 'Total', 'Lineitem quantity', 'Lineite
 
 
 def getEBNumber(orderNum):
+    print("[order number]:", orderNum)
     on = orderNum.split('-')
     if len(on) == 3:
         return 'EB'+on[2]
-
 def getPriceNumber(orderPrice):
     price_list = orderPrice.split('$')
     if len(price_list) == 2:
@@ -42,11 +37,12 @@ def getDateFormat(dstr):
 
 def read_file(filename):
     sendz_rows = []
-    with open(filename) as ebayOrdersFile:
-        eBayOrders = csv.DictReader(ebayOrdersFile)
+    row_count = 0
+    with open(filename, 'r', encoding='utf-8-sig',errors='ignore') as ebayOrdersFile:
+        eBayOrders = csv.DictReader(ebayOrdersFile, restkey='Rest')
         eBayOrderList = list(eBayOrders)
         for r in eBayOrderList:
-            if len(r['Order Number']) > 6:
+            if r:
                 urow = {}
                 urow['Name']=getEBNumber(r['Order Number'])
                 urow['Email']= ''
@@ -66,7 +62,9 @@ def read_file(filename):
                 urow['Shipping Country']='AU'
                 urow['Shipping Phone']=r['Post To Phone']
                 sendz_rows.append(urow)
-    return sendz_rows
+                row_count += 1
+                
+    return sendz_rows, row_count
 
 
 def write_file(filename, rows):
@@ -76,13 +74,13 @@ def write_file(filename, rows):
         writer.writerows(rows)
 
 
-print("Start reading file: ", filename)
-sendz_rows = read_file(filename)
+print("[Read -", filename, ']')
+sendz_rows, row_count = read_file(filename)
 
 newFileName = "sendz_upload.csv"
 
-print("writing to file: ", newFileName)
-write_file(newFileName, sendz_rows)
-
-print("File:", newFileName, " created.")
+if row_count > 1:
+    print("[Write -", newFileName, ']')
+    write_file(newFileName, sendz_rows)
+    print("[Created -", newFileName, ']')
 
