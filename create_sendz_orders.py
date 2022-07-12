@@ -112,4 +112,4 @@ def create_sendz_file(filename):
 
 reformatted_filename = csv_reformat(original_file)
 print(f'[reformatted]: {reformatted_filename}')
-#create_sendz_file(reformatted_filename)
+create_sendz_file(reformatted_filename)
