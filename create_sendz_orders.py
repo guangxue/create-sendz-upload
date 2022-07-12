@@ -60,9 +60,10 @@ def csv_reformat(original_file):
             # if 2nd column is NOT empty & match pattern "06-08743-80550" || 2nd column name is "Order Number"
             if (r[1] and pattern.match(r[1])) or r[1] == 'Order Number':
                 # create a reformatted csv and write the row by row with "append" mode
-                with open(reformatted_filename, mode='a') as untitled_file:
-                    untitled_filewriter = csv.writer(untitled_file, delimiter=',')
-                    untitled_filewriter.writerow(r)
+                if len(r) > 59 and r[58] != "Local Pickup":
+                    with open(reformatted_filename, mode='a') as untitled_file:
+                        untitled_filewriter = csv.writer(untitled_file, delimiter=',')
+                        untitled_filewriter.writerow(r)
     return reformatted_filename
 
 
@@ -111,4 +112,4 @@ def create_sendz_file(filename):
 
 reformatted_filename = csv_reformat(original_file)
 print(f'[reformatted]: {reformatted_filename}')
-create_sendz_file(reformatted_filename)
+#create_sendz_file(reformatted_filename)
